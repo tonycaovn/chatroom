@@ -1,0 +1,45 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<div id="status">Connecting</div>
+		<div id="chatArea">
+		</div>
+		<form id="chatForm">
+			<textarea id="chatInput"></textarea>
+			<br/>
+			<button type="submit">Send</button>
+		</form>
+	</body>
+	<script src="libs/socket.io-client/socket.io.js"></script>
+	<script src="libs/jquery/dist/jquery.min.js"></script>
+	<script>
+	$(function(){
+		function insertMessage(data){
+			$("#chatArea").append(data);
+			$("#chatArea").append("<br/>");
+		}
+		var socket = io.connect('http://192.168.1.46:3000');
+
+		socket.on('connect',function(data){
+			$("#status").html('Connected');
+			nickname = prompt("What is your nickname? ");
+			socket.emit('join',nickname);
+		});
+
+		socket.on('message',function(data){
+			console.log(data);
+		});
+		socket.on('messages',function(data){
+			console.log("message comming ",data);
+			insertMessage(data);
+		});
+
+		$('#chatForm').submit(function(e){
+			e.preventDefault();
+			var message = $('#chatInput').val();
+			socket.emit('messages',message);
+		});
+	});
+	</script>
+</html>
