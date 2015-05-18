@@ -2,14 +2,19 @@
 	<head>
 	</head>
 	<body>
-		<div id="status">Connecting</div>
-		<div id="chatArea">
+		<div style="display:inline-block;vertical-align:top;border-right:1px solid #ddd; width:100px;height:500px;overflow:auto;">
+			Who in this chat room? 
 		</div>
-		<form id="chatForm">
-			<textarea id="chatInput"></textarea>
-			<br/>
-			<button type="submit">Send</button>
-		</form>
+		<div  style="display:inline-block;vertical-align:top;">
+			<div id="status">Connecting</div>
+			<form id="chatForm">
+				<textarea id="chatInput"></textarea>
+				<br/>
+				<button type="submit">Send</button>
+			</form>
+			<div id="chatArea" style="">
+			</div>
+		</div>
 	</body>
 	<script src="libs/socket.io-client/socket.io.js"></script>
 	<script src="libs/jquery/dist/jquery.min.js"></script>
@@ -22,9 +27,9 @@
 		var socket = io.connect('http://192.168.1.46:3000');
 
 		socket.on('connect',function(data){
-			$("#status").html('Connected');
 			nickname = prompt("What is your nickname? ");
 			socket.emit('join',nickname);
+			$("#status").html('Nickname: '+nickname);
 		});
 
 		socket.on('message',function(data){
@@ -35,11 +40,19 @@
 			insertMessage(data);
 		});
 
+		socket.on('add chatter',function(name){
+			var chatter = $("<li>"+name+"</li>").data('name',name);
+			$("#chatter").append(chatter);
+		});
+
 		$('#chatForm').submit(function(e){
 			e.preventDefault();
 			var message = $('#chatInput').val();
 			socket.emit('messages',message);
+			$(this).find("input[type=text], textarea").val("");	
 		});
+
+
 	});
 	</script>
 </html>
